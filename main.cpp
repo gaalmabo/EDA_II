@@ -1,0 +1,193 @@
+#include <iostream>
+#include <vector>
+
+#include "Estudiante.h"
+#include "LeerArchivo.h"
+#include "GeneradorEstudiantes.h"
+#include "ArbolAvl.h"
+
+using namespace std;
+
+int main()
+{
+    vector<string> nombres;
+    vector<string> apellidos;
+    vector<Estudiante*> estudiantes;
+
+    ArbolAvl arbol;
+
+    bool datosCargados = false;
+    bool estudiantesGenerados = false;
+    bool arbolCreado = false;
+
+    int opcion;
+
+    do
+    {
+        cout << "\n========== MENU PRINCIPAL ==========" << endl;
+        cout << "1. Leer archivo CSV" << endl;
+        cout << "2. Generar 300 estudiantes" << endl;
+        cout << "3. Mostrar estudiantes generados" << endl;
+        cout << "4. Insertar estudiantes en arbol AVL" << endl;
+        cout << "5. Mostrar AVL en orden por apellido" << endl;
+        cout << "6. Imprimir estructura del arbol AVL" << endl;
+        cout << "7. Salir" << endl;
+        cout << "Seleccione una opcion: ";
+        cin >> opcion;
+
+        switch(opcion)
+        {
+            case 1:
+            {
+                LeerArchivo lector("nombre_apellido.csv");
+
+                nombres = lector.LeerNombres();
+                apellidos = lector.LeerApellidos();
+
+                if(nombres.empty() || apellidos.empty())
+                {
+                    cout << "No se pudo cargar el archivo CSV." << endl;
+                    cout << "Verifica que nombre_apellido.csv este en la carpeta correcta." << endl;
+                    datosCargados = false;
+                }
+                else
+                {
+                    cout << "Archivo CSV cargado correctamente." << endl;
+                    cout << "Cantidad de nombres cargados: " << nombres.size() << endl;
+                    cout << "Cantidad de apellidos cargados: " << apellidos.size() << endl;
+                    datosCargados = true;
+                }
+
+                break;
+            }
+
+            case 2:
+            {
+                if(!datosCargados)
+                {
+                    cout << "Primero debes leer el archivo CSV." << endl;
+                    break;
+                }
+
+                // Si ya habia estudiantes generados antes, los eliminamos
+                for(size_t i = 0; i < estudiantes.size(); i++)
+                {
+                    delete estudiantes[i];
+                }
+
+                estudiantes.clear();
+
+                GeneradorEstudiantes generador(nombres, apellidos);
+                estudiantes = generador.GenerarVectorEstudiantes(300);
+
+                cout << "Se generaron 300 estudiantes correctamente." << endl;
+
+                estudiantesGenerados = true;
+                arbolCreado = false;
+
+                // Reiniciamos el arbol porque se generaron nuevos estudiantes
+                arbol = ArbolAvl();
+
+                break;
+            }
+
+            case 3:
+            {
+                if(!estudiantesGenerados)
+                {
+                    cout << "Primero debes generar los estudiantes." << endl;
+                    break;
+                }
+
+                cout << "\n========== ESTUDIANTES GENERADOS ==========" << endl;
+                cout << "Codigo,Nombre,Apellido,PPA" << endl;
+
+                for(size_t i = 0; i < estudiantes.size(); i++)
+                {
+                    estudiantes[i]->MostrarDatos();
+                }
+
+                break;
+            }
+
+            case 4:
+            {
+                if(!estudiantesGenerados)
+                {
+                    cout << "Primero debes generar los estudiantes." << endl;
+                    break;
+                }
+
+                // Reiniciamos el arbol antes de insertar para evitar duplicados
+                arbol = ArbolAvl();
+
+                for(size_t i = 0; i < estudiantes.size(); i++)
+                {
+                    arbol.raiz = arbol.InsertarNodo(arbol.raiz, estudiantes[i]);
+                }
+
+                arbolCreado = true;
+
+                cout << "Los estudiantes fueron insertados en el arbol AVL correctamente." << endl;
+
+                break;
+            }
+
+            case 5:
+            {
+                if(!arbolCreado)
+                {
+                    cout << "Primero debes insertar los estudiantes en el AVL." << endl;
+                    break;
+                }
+
+                cout << "\n========== AVL EN ORDEN POR APELLIDO ==========" << endl;
+                cout << "Codigo,Nombre,Apellido,PPA" << endl;
+
+                arbol.Inorder(arbol.raiz);
+
+                break;
+            }
+
+            case 6:
+            {
+                if(!arbolCreado)
+                {
+                    cout << "Primero debes insertar los estudiantes en el AVL." << endl;
+                    break;
+                }
+
+                cout << "\n========== ESTRUCTURA DEL ARBOL AVL ==========" << endl;
+                cout << "El arbol se imprime de lado." << endl;
+                cout << "Los nodos de la derecha aparecen arriba y los de la izquierda abajo." << endl;
+
+                arbol.printTree(arbol.raiz);
+
+                break;
+            }
+
+            case 7:
+            {
+                cout << "Saliendo del programa..." << endl;
+                break;
+            }
+
+            default:
+            {
+                cout << "Opcion invalida. Intente nuevamente." << endl;
+                break;
+            }
+        }
+
+    } while(opcion != 7);
+
+    // Liberamos memoria de los estudiantes creados con new
+    for(size_t i = 0; i < estudiantes.size(); i++)
+    {
+        delete estudiantes[i];
+    }
+
+    estudiantes.clear();
+
+    return 0;
+}
