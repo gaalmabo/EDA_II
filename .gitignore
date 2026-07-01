@@ -1,0 +1,13 @@
+# Carpetas de compilación
+bin/
+obj/
+
+# Configuración de VS Code
+.vscode/
+
+# Ejecutables
+*.exe
+
+# Archivos temporales de Code::Blocks
+*.depend
+*.layout
