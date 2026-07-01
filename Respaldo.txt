@@ -5,7 +5,6 @@
 #include "LeerArchivo.h"
 #include "GeneradorEstudiantes.h"
 #include "ArbolAvl.h"
-#include "buscadorKMP.h"
 
 using namespace std;
 
@@ -32,8 +31,7 @@ int main()
         cout << "4. Insertar estudiantes en arbol AVL" << endl;
         cout << "5. Mostrar AVL en orden por apellido" << endl;
         cout << "6. Imprimir estructura del arbol AVL" << endl;
-        cout << "7. Buscar estudiantes por apellido (KMP)" << endl;
-        cout << "8. Salir" << endl;
+        cout << "7. Salir" << endl;
         cout << "Seleccione una opcion: ";
         cin >> opcion;
 
@@ -71,6 +69,7 @@ int main()
                     break;
                 }
 
+                // Si ya habia estudiantes generados antes, los eliminamos
                 for(size_t i = 0; i < estudiantes.size(); i++)
                 {
                     delete estudiantes[i];
@@ -86,6 +85,7 @@ int main()
                 estudiantesGenerados = true;
                 arbolCreado = false;
 
+                // Reiniciamos el arbol porque se generaron nuevos estudiantes
                 arbol = ArbolAvl();
 
                 break;
@@ -118,6 +118,7 @@ int main()
                     break;
                 }
 
+                // Reiniciamos el arbol antes de insertar para evitar duplicados
                 arbol = ArbolAvl();
 
                 for(size_t i = 0; i < estudiantes.size(); i++)
@@ -167,37 +168,6 @@ int main()
 
             case 7:
             {
-                if(!estudiantesGenerados)
-                {
-                    cout << "Primero debes generar los estudiantes." << endl;
-                    break;
-                }
-
-                string patron;
-                bool encontrado = false;
-
-                cout << "Ingrese el apellido o parte del apellido: ";
-                cin >> patron;
-
-                cout << "\n========== RESULTADOS ==========" << endl;
-                cout << "Codigo,Nombre,Apellido,PPA" << endl;
-
-                for(size_t i = 0; i < estudiantes.size(); i++) {
-                    if(BuscadorKMP::Buscar(estudiantes[i]->GetApellido(), patron)) {
-                        estudiantes[i]->MostrarDatos();
-                        encontrado = true;
-                    }
-                }
-
-                if(!encontrado) {
-                    cout << "No se encontraron estudiantes." << endl;
-                }
-
-                break;
-            }
-
-            case 8:
-            {
                 cout << "Saliendo del programa..." << endl;
                 break;
             }
@@ -209,8 +179,9 @@ int main()
             }
         }
 
-    } while(opcion != 8);
+    } while(opcion != 7);
 
+    // Liberamos memoria de los estudiantes creados con new
     for(size_t i = 0; i < estudiantes.size(); i++)
     {
         delete estudiantes[i];
@@ -220,5 +191,3 @@ int main()
 
     return 0;
 }
-
-
